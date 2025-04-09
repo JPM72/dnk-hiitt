@@ -1,17 +1,18 @@
 @use '@angular/material' as mat;
 
 :host {
+
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	max-width: 36rem;
+
 	@include mat.progress-bar-overrides(
 		(
 			active-indicator-height: 20px,
 			track-height: 20px
 		)
 	);
-
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-	max-width: 36rem;
 
 	.timer-display {
 		display: flex;

@@ -11,9 +11,4 @@
 	<button mat-fab aria-label="Stop" (click)="store.stop()">
 		<mat-icon>stop</mat-icon>
 	</button>
-	<button mat-fab aria-label="Pause or resume" (click)="store.pause()">
-		<mat-icon>
-			@if (store.isPaused()) {not_started} @else {pause}
-		</mat-icon>
-	</button>
 </div>

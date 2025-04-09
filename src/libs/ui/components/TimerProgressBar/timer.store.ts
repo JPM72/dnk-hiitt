@@ -17,6 +17,7 @@ const initialState: TimerState = {
 }
 
 const TICK_INTERVAL = 16
+const INTERVAL_DURATION = 3e3
 const { round } = Math
 const setInterval = function (...args: Parameters<typeof window.setInterval>)
 {
@@ -24,6 +25,15 @@ const setInterval = function (...args: Parameters<typeof window.setInterval>)
 }
 
 const throttle = _.throttle((...args) => console.log(...args), 100)
+
+const audioPlayer = {
+	audio: null,
+	play()
+	{
+		this.audio ??= new Audio('/sounds/beep.mp3')
+		this.audio.play()
+	}
+}
 
 export const TimerStore = signalStore(
 	withState(initialState),
@@ -45,7 +55,7 @@ export const TimerStore = signalStore(
 		{
 			return Math.min(
 				100,
-				_.round(100 * (currentTime() / 60000), 3)
+				_.round(100 * (currentTime() / INTERVAL_DURATION), 3)
 			)
 		}),
 	})),
@@ -64,11 +74,26 @@ export const TimerStore = signalStore(
 				throttle(s)
 				if (store.isPaused()) return {}
 				const { startTime } = state
-				return {
-					elapsedTime: startTime
-						? performance.now() - (state.startTime ?? 0)
-						: null
+				const current = store.currentTime()
+
+
+				if (current >= INTERVAL_DURATION)
+				{
+					audioPlayer.play()
+					return {
+						startTime: performance.now(),
+						elapsedTime: null,
+						accumulatedTime: 0,
+					}
+				} else
+				{
+					return {
+						elapsedTime: startTime
+							? performance.now() - (startTime ?? 0)
+							: null
+					}
 				}
+
 			})
 		},
 		updateIntervalId(...args: Parameters<typeof setInterval> | []): void
