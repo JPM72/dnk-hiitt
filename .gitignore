@@ -4,6 +4,8 @@
 .github
 .nx
 .vscode
+.code-workspace
+.firebase
 
 # compiled output
 dist
