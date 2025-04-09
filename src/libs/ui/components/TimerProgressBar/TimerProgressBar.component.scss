@@ -1,0 +1,33 @@
+@use '@angular/material' as mat;
+
+:host {
+	@include mat.progress-bar-overrides(
+		(
+			active-indicator-height: 20px,
+			track-height: 20px
+		)
+	);
+
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	max-width: 36rem;
+
+	.timer-display {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+
+		.timer-text {
+			font-size: 2rem;
+			font-variant-numeric: tabular-nums;
+		}
+	}
+
+	.button-group {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		gap: 0.125rem;
+	}
+}

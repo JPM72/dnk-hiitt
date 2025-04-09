@@ -1,0 +1,19 @@
+<div class="timer-display">
+	<div class="timer-text">{{ store.timeText() }}</div>
+</div>
+<mat-progress-bar mode="determinate" [value]="store.progress()" [attr.reset]="isResetting() ? '' : null" />
+<div class="button-group">
+	<button mat-fab aria-label="Start" (click)="store.play()">
+		<mat-icon>
+			@if (store.isPaused()) {play_arrow} @else {pause}
+		</mat-icon>
+	</button>
+	<button mat-fab aria-label="Stop" (click)="store.stop()">
+		<mat-icon>stop</mat-icon>
+	</button>
+	<button mat-fab aria-label="Pause or resume" (click)="store.pause()">
+		<mat-icon>
+			@if (store.isPaused()) {not_started} @else {pause}
+		</mat-icon>
+	</button>
+</div>
