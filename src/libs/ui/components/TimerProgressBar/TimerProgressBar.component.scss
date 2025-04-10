@@ -31,4 +31,8 @@
 		justify-content: flex-start;
 		gap: 0.125rem;
 	}
+
+	input[type="number"] {
+		appearance: text;
+	}
 }

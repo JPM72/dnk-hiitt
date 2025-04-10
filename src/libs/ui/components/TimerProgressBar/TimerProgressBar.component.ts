@@ -11,10 +11,15 @@ import { CommonModule } from '@angular/common'
 import { MatProgressBarModule } from '@angular/material/progress-bar'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
 	selector: 'app-timer-progress-bar',
-	imports: [CommonModule, MatProgressBarModule, MatButtonModule, MatIconModule],
+	imports: [
+		CommonModule, MatProgressBarModule, MatButtonModule, MatIconModule,
+		MatFormFieldModule, MatInputModule,
+	],
 	templateUrl: './TimerProgressBar.component.html',
 	styleUrl: './TimerProgressBar.component.scss',
 	providers: [TimerStore],
@@ -50,11 +55,5 @@ export class TimerProgressBarComponent
 		this.store.stop()
 
 		setTimeout(() => this.isResetting.set(false), 32)
-	}
-
-	playSound()
-	{
-		const audio = new Audio('/sounds/beep.mp3')
-		// audio.play()
 	}
 }
