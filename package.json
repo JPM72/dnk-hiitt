@@ -4,7 +4,9 @@
   "license": "MIT",
   "scripts": {
     "start": "nx serve",
+    "watch": "nx serve --watch",
     "build": "nx build",
+    "deploy": "nx build && firebase deploy --only hosting",
     "test": "nx test"
   },
   "private": true,

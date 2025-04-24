@@ -1,12 +1,18 @@
 import _ from 'lodash'
 import { computed } from '@angular/core'
 import { patchState, signalStore, withState, withComputed, withMethods } from '@ngrx/signals'
+import { formatTime } from '@/libs/utils'
 
 type TimerState = {
 	startTime: number | null
 	accumulatedTime: number
 	elapsedTime: number | null
 	intervalId: number | null
+	minutes: number | null
+	seconds: number | null
+	rounds: number | null
+	currentRound: number
+	audioShouldPlay: boolean
 }
 
 const initialState: TimerState = {
@@ -14,48 +20,46 @@ const initialState: TimerState = {
 	accumulatedTime: 0,
 	elapsedTime: null,
 	intervalId: null,
+	minutes: null,
+	seconds: null,
+	rounds: null,
+	currentRound: 0,
+	audioShouldPlay: true,
 }
 
 const TICK_INTERVAL = 16
-const INTERVAL_DURATION = 3e3
-const { round } = Math
 const setInterval = function (...args: Parameters<typeof window.setInterval>)
 {
 	return window.setInterval(...args) as unknown as number
 }
 
-const throttle = _.throttle((...args) => console.log(...args), 100)
-
 const audioPlayer = {
-	audio: null,
+	audio: new Audio('/sounds/beeping-5-countdown.mp3'),
 	play()
 	{
-		this.audio ??= new Audio('/sounds/beep.mp3')
 		this.audio.play()
 	}
 }
 
 export const TimerStore = signalStore(
 	withState(initialState),
-	withComputed(({ elapsedTime, accumulatedTime, intervalId }) => ({
+	withComputed(({
+		elapsedTime, accumulatedTime, intervalId,
+		minutes, seconds,
+	}) => ({
 		isPaused: computed(() => typeof intervalId() !== 'number'),
-		currentTime: computed(() => accumulatedTime() + (elapsedTime() ?? 0))
+		currentTime: computed(() => accumulatedTime() + (elapsedTime() ?? 0)),
+		intervalDuration: computed(() => 1e3 * (60 * (minutes() ?? 0) + (seconds() ?? 0))),
 	})),
-	withComputed(({ currentTime }) => ({
-		timeText: computed(() =>
-		{
-			const t = round(currentTime())
-
-			const minutes = `${(t / 60000) | 0}`.padStart(2, '0')
-			const seconds = `${(t / 1000) % 60 | 0}`.padStart(2, '0')
-			const milliseconds = `${t % 1000}`.padStart(3, '0')
-			return `${minutes}:${seconds}.${milliseconds}`
-		}),
+	withComputed(({ currentTime, intervalDuration }) => ({
+		timeText: computed(() => formatTime(currentTime())),
 		progress: computed(() =>
 		{
+			const duration = intervalDuration()
+			if (!duration) return 0
 			return Math.min(
 				100,
-				_.round(100 * (currentTime() / INTERVAL_DURATION), 3)
+				_.round(100 * (currentTime() / duration), 3)
 			)
 		}),
 	})),
@@ -65,36 +69,46 @@ export const TimerStore = signalStore(
 		{
 			patchState(store, state =>
 			{
-				const s = {
-					...state,
-					isPaused: store.isPaused(),
-					currentTime: store.currentTime(),
-					progress: store.progress(),
-				}
-				throttle(s)
 				if (store.isPaused()) return {}
 				const { startTime } = state
 				const current = store.currentTime()
+				const intervalDuration = store.intervalDuration()
 
+				let audioShouldPlay = state.audioShouldPlay
 
-				if (current >= INTERVAL_DURATION)
+				if (audioShouldPlay && intervalDuration > 5e3)
 				{
-					audioPlayer.play()
+					if ((intervalDuration - current) <= 5e3)
+					{
+						audioPlayer.play()
+						audioShouldPlay = false
+					}
+				}
+
+				if (intervalDuration && current >= intervalDuration)
+				{
+					const currentRound = store.currentRound() + 1
+
 					return {
 						startTime: performance.now(),
 						elapsedTime: null,
 						accumulatedTime: 0,
+						currentRound,
+						audioShouldPlay: true,
 					}
 				} else
 				{
 					return {
 						elapsedTime: startTime
 							? performance.now() - (startTime ?? 0)
-							: null
+							: null,
+						audioShouldPlay
 					}
 				}
-
 			})
+
+			const rounds = store.rounds()
+			if (rounds && store.currentRound() >= rounds) this.stop()
 		},
 		updateIntervalId(...args: Parameters<typeof setInterval> | []): void
 		{
@@ -109,6 +123,10 @@ export const TimerStore = signalStore(
 					return { intervalId: null }
 				}
 			})
+		},
+		update(values: Partial<TimerState>)
+		{
+			patchState(store, values)
 		},
 		start(): void
 		{
@@ -129,7 +147,10 @@ export const TimerStore = signalStore(
 		stop(): void
 		{
 			this.pause()
-			patchState(store, { accumulatedTime: null })
+			patchState(store, {
+				accumulatedTime: null,
+				currentRound: 0,
+			})
 		},
 		play(): void
 		{
@@ -137,6 +158,12 @@ export const TimerStore = signalStore(
 			{
 				this.pause()
 			} else this.start()
+		},
+		reset()
+		{
+			patchState(store, {
+				minutes: null, seconds: null, rounds: null,
+			})
 		},
 	}))
 )

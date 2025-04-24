@@ -1,11 +1,24 @@
-<div>
+<div class="input-group">
 	<mat-form-field>
-		<input matInput type="number" inputmode="numeric" placeholder="0" />
+		<input matInput type="number" inputmode="numeric" placeholder="0" min="0" max="59" [formControl]="minutes" class="input-group__input"/>
 		<span matTextSuffix>minutes</span>
+	</mat-form-field>
+	<mat-form-field>
+		<input matInput type="number" inputmode="numeric" placeholder="0" min="0" max="59" [formControl]="seconds" />
+		<span matTextSuffix>seconds</span>
+	</mat-form-field>
+	<mat-form-field>
+		<input matInput type="number" inputmode="numeric" placeholder="0" min="0" [formControl]="rounds" />
+		<span matTextSuffix>rounds</span>
 	</mat-form-field>
 </div>
 <div class="timer-display">
-	<div class="timer-text">{{ store.timeText() }}</div>
+	<div class="timer-text">
+		<span>{{ store.timeText().minutes }}</span>
+		<span>:{{ store.timeText().seconds }}</span>
+		<span class="timer-text__milliseconds">.{{ store.timeText().milliseconds }}</span>
+	</div>
+	<div class="timer-text">{{ roundsText() }}</div>
 </div>
 <mat-progress-bar mode="determinate" [value]="store.progress()" [attr.reset]="isResetting() ? '' : null" />
 <div class="button-group">
@@ -14,7 +27,7 @@
 			@if (store.isPaused()) {play_arrow} @else {pause}
 		</mat-icon>
 	</button>
-	<button mat-fab aria-label="Stop" (click)="store.stop()">
+	<button mat-fab aria-label="Stop" (click)="reset()">
 		<mat-icon>stop</mat-icon>
 	</button>
 </div>
