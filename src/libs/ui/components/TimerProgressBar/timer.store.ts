@@ -2,6 +2,28 @@ import _ from 'lodash'
 import { computed } from '@angular/core'
 import { patchState, signalStore, withState, withComputed, withMethods } from '@ngrx/signals'
 import { formatTime } from '@/libs/utils'
+import { Howl } from 'howler'
+
+interface AudioMarker
+{
+	offset: number
+	name: string
+}
+
+const BASE_AUDIO_MARKERS = [
+	{
+		name: 'thirty.mp3',
+		offset: 30e3,
+	},
+	{
+		name: 'fifteen.mp3',
+		offset: 15e3,
+	},
+	{
+		name: 'beeping-5-countdown.mp3',
+		offset: 5e3,
+	},
+]
 
 type TimerState = {
 	startTime: number | null
@@ -12,7 +34,7 @@ type TimerState = {
 	seconds: number | null
 	rounds: number | null
 	currentRound: number
-	audioShouldPlay: boolean
+	audioMarkers: AudioMarker[]
 }
 
 const initialState: TimerState = {
@@ -24,20 +46,35 @@ const initialState: TimerState = {
 	seconds: null,
 	rounds: null,
 	currentRound: 0,
-	audioShouldPlay: true,
+	audioMarkers: [...BASE_AUDIO_MARKERS],
 }
+
 
 const TICK_INTERVAL = 16
 const setInterval = function (...args: Parameters<typeof window.setInterval>)
 {
 	return window.setInterval(...args) as unknown as number
 }
+const playMarker = (marker: AudioMarker) =>
+{
+	const sound = new Howl({ src: [`/sounds/${marker.name}`] })
+	sound.play()
+}
 
-const audioPlayer = {
-	audio: new Audio('/sounds/beeping-5-countdown.mp3'),
-	play()
+const markerPlayer = {
+	howl: null,
+	stop()
 	{
-		this.audio.play()
+		const { howl } = this
+		_.invoke(howl, 'stop')
+		_.invoke(howl, 'unload')
+		this.howl = null
+	},
+	play(name: string)
+	{
+		this.stop()
+		this.howl = new Howl({ src: [`/sounds/${name}`] })
+		this.howl.play()
 	}
 }
 
@@ -67,23 +104,13 @@ export const TimerStore = signalStore(
 	({
 		tick(): void
 		{
+			const prevRound = store.currentRound()
 			patchState(store, state =>
 			{
 				if (store.isPaused()) return {}
 				const { startTime } = state
 				const current = store.currentTime()
 				const intervalDuration = store.intervalDuration()
-
-				let audioShouldPlay = state.audioShouldPlay
-
-				if (audioShouldPlay && intervalDuration > 5e3)
-				{
-					if ((intervalDuration - current) <= 5e3)
-					{
-						audioPlayer.play()
-						audioShouldPlay = false
-					}
-				}
 
 				if (intervalDuration && current >= intervalDuration)
 				{
@@ -94,7 +121,6 @@ export const TimerStore = signalStore(
 						elapsedTime: null,
 						accumulatedTime: 0,
 						currentRound,
-						audioShouldPlay: true,
 					}
 				} else
 				{
@@ -102,13 +128,33 @@ export const TimerStore = signalStore(
 						elapsedTime: startTime
 							? performance.now() - (startTime ?? 0)
 							: null,
-						audioShouldPlay
 					}
 				}
 			})
 
+			this.playMarkers()
+
 			const rounds = store.rounds()
-			if (rounds && store.currentRound() >= rounds) this.stop()
+			const currentRound = store.currentRound()
+
+			if (prevRound !== currentRound)
+			{
+				this.fillMarkers()
+
+				if (rounds && currentRound >= rounds) this.stop()
+			}
+
+
+
+			// if (store.currentRound() !== prevRound) console.log(prevRound, store.currentRound())
+
+			// if (rounds)
+			// {
+			// 	const currentRound = store.currentRound()
+			// 	if (currentRound >= rounds) this.stop()
+			// }
+
+			// if (rounds && store.currentRound() >= rounds) this.stop()
 		},
 		updateIntervalId(...args: Parameters<typeof setInterval> | []): void
 		{
@@ -133,11 +179,13 @@ export const TimerStore = signalStore(
 			patchState(store, {
 				startTime: performance.now(),
 			})
+			this.fillMarkers()
 			this.updateIntervalId(() => this.tick(), TICK_INTERVAL)
 		},
 		pause(): void
 		{
 			this.updateIntervalId()
+			markerPlayer.stop()
 			patchState(store, ({ elapsedTime, accumulatedTime }) => ({
 				startTime: null,
 				accumulatedTime: accumulatedTime + (elapsedTime ?? 0),
@@ -151,6 +199,7 @@ export const TimerStore = signalStore(
 				accumulatedTime: null,
 				currentRound: 0,
 			})
+			this.fillMarkers()
 		},
 		play(): void
 		{
@@ -159,10 +208,38 @@ export const TimerStore = signalStore(
 				this.pause()
 			} else this.start()
 		},
-		reset()
+		reset(): void
 		{
 			patchState(store, {
 				minutes: null, seconds: null, rounds: null,
+			})
+			this.fillMarkers()
+		},
+		fillMarkers(): void
+		{
+			patchState(store, () =>
+			{
+				const intervalDuration = store.intervalDuration()
+				console.log(intervalDuration)
+				return {
+					audioMarkers: _.filter(
+						[...BASE_AUDIO_MARKERS],
+						({ offset }) => offset <= intervalDuration
+					)
+				}
+			})
+		},
+		playMarkers(): void
+		{
+			patchState(store, ({ audioMarkers }) =>
+			{
+				const current = store.currentTime()
+				const intervalDuration = store.intervalDuration()
+				const cutoff = intervalDuration - current
+
+				const [toPlay, markers] = _.partition(audioMarkers, ({ offset }) => cutoff <= offset)
+				for (const { name } of toPlay) markerPlayer.play(name)
+				return { audioMarkers: markers }
 			})
 		},
 	}))

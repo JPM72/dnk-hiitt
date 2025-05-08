@@ -1,6 +1,7 @@
 <div class="input-group">
 	<mat-form-field>
-		<input matInput type="number" inputmode="numeric" placeholder="0" min="0" max="59" [formControl]="minutes" class="input-group__input"/>
+		<input matInput type="number" inputmode="numeric" placeholder="0" min="0" max="59" [formControl]="minutes"
+			class="input-group__input" />
 		<span matTextSuffix>minutes</span>
 	</mat-form-field>
 	<mat-form-field>
@@ -12,15 +13,21 @@
 		<span matTextSuffix>rounds</span>
 	</mat-form-field>
 </div>
-<div class="timer-display">
-	<div class="timer-text">
-		<span>{{ store.timeText().minutes }}</span>
-		<span>:{{ store.timeText().seconds }}</span>
-		<span class="timer-text__milliseconds">.{{ store.timeText().milliseconds }}</span>
+<div class="timer-container">
+	<div class="progress-spinner-container">
+		<mat-progress-spinner mode="determinate" value="100" class="background-spinner" />
+		<mat-progress-spinner mode="determinate" [value]="store.progress()" />
+		<app-segmented-circular-progress [steps]="store.rounds()" [step]="store.currentRound()" />
+		<div class="timer-display">
+			<div class="timer-text">
+				<span>{{ store.timeText().minutes }}</span>
+				<span>:{{ store.timeText().seconds }}</span>
+				<span class="timer-text__milliseconds">.{{ store.timeText().milliseconds }}</span>
+			</div>
+			<div class="timer-text rounds-text">{{ roundsText() }}</div>
+		</div>
 	</div>
-	<div class="timer-text">{{ roundsText() }}</div>
 </div>
-<mat-progress-bar mode="determinate" [value]="store.progress()" [attr.reset]="isResetting() ? '' : null" />
 <div class="button-group">
 	<button mat-fab aria-label="Start" (click)="store.play()">
 		<mat-icon>
@@ -31,3 +38,4 @@
 		<mat-icon>stop</mat-icon>
 	</button>
 </div>
+<!-- <app-duration-input /> -->

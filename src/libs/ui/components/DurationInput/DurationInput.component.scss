@@ -1,0 +1,9 @@
+:host {
+	input {
+		outline: 0;
+		border: none;
+		font-size: 2rem;
+		font-family: var(--mat-form-field-container-text-font, var(--mat-sys-body-large-font));
+		background-color: var(--mdc-filled-text-field-container-color, var(--mat-sys-surface-variant));
+	}
+}

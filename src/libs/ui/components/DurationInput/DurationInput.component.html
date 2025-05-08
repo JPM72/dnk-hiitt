@@ -1,0 +1,8 @@
+<input
+	type="text"
+	inputmode="numeric"
+	autocomplete="off"
+	[formControl]="control"
+	(beforeinput)="onBeforeInput($event)"
+/>
+<p>{{ value }}</p>

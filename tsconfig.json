@@ -15,9 +15,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@/libs/*": ["./src/libs/*"],
+      "@/libs/*": ["./src/libs/*"]
     },
-	"allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,

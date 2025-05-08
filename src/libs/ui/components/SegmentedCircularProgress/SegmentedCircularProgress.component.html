@@ -1,0 +1,12 @@
+<div class="segmented-circular-progress__circles">
+	<svg>
+		<circle [attr.r]="radius()" [attr.cy]="radius()" [attr.cx]="radius()" stroke-width="5"
+			[style.stroke-dasharray]="backgroundStrokeDashArray()"
+			class="segmented-circular-progress__circles__background-dashes">
+		</circle>
+		<circle [attr.r]="radius()" [attr.cy]="radius()" [attr.cx]="radius()" stroke-width="6"
+			[style]="circleStyles()"
+			class="segmented-circular-progress__circles__progress-dashes">
+		</circle>
+	</svg>
+</div>
