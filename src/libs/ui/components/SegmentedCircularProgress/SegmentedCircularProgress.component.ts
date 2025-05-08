@@ -43,7 +43,7 @@ export class SegmentedCircularProgressComponent
 	circleStyles = computed(() =>
 	{
 		const step = this.step()
-		console.log(step)
+
 		if (!step) return {
 			stroke: 'none'
 		}
