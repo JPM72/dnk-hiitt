@@ -1,6 +1,6 @@
-const { round, floor } = Math
+const { round } = Math
 
-export function getTimeIntervals(totalMilliseconds: number)
+export function decomposeDuration(totalMilliseconds: number)
 {
 	const t = round(totalMilliseconds)
 	const hours = t / 3600e3 | 0
@@ -9,4 +9,4 @@ export function getTimeIntervals(totalMilliseconds: number)
 	const milliseconds = t % 1e3
 	return { hours, minutes, seconds, milliseconds }
 }
-export default getTimeIntervals
+export default decomposeDuration

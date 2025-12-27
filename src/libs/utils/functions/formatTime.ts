@@ -1,12 +1,11 @@
-const { round } = Math
+import { decomposeDuration } from './decomposeDuration'
 
-export function formatTime(time: number)
+export function formatTime(timeInMilliseconds: number)
 {
-	const t = round(time)
-	const minutes = `${(t / 60000) | 0}`.padStart(2, '0')
-	const seconds = `${(t / 1000) % 60 | 0}`.padStart(2, '0')
-	const milliseconds = `${t % 1000}`.padStart(3, '0')
-	// return `${minutes}:${seconds}.${milliseconds}`
+	const t = decomposeDuration(timeInMilliseconds)
+	const minutes = `${t.minutes}`.padStart(2, '0')
+	const seconds = `${t.seconds}`.padStart(2, '0')
+	const milliseconds = `${t.milliseconds}`.padStart(3, '0')
 	return { minutes, seconds, milliseconds }
 }
 export default formatTime

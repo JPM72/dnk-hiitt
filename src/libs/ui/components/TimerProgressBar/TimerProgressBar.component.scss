@@ -62,12 +62,6 @@
 
 		.timer-text {
 			font-variant-numeric: tabular-nums;
-
-			.timer-text__milliseconds {
-				font-size: 3rem;
-				opacity: 0.5;
-			}
-
 			&.rounds-text {
 				position: absolute;
 				top: 100%;

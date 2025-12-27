@@ -21,6 +21,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms'
 import { WakeLockService } from '@/libs/services'
 import { DurationInputComponent } from '../DurationInput/DurationInput.component'
 import { SegmentedCircularProgressComponent } from '../SegmentedCircularProgress/SegmentedCircularProgress.component'
+import { TimerTextDisplayComponent } from '../TimerTextDisplay/TimerTextDisplay.component'
 
 const MDC_DISABLE_TRANSITION_SELECTOR = '.progress-spinner-container mat-progress-spinner:not(.background-spinner) .mdc-circular-progress__determinate-circle'
 
@@ -39,6 +40,7 @@ const customSpinnerOptions: MatProgressSpinnerDefaultOptions = {
 		SegmentedCircularProgressComponent,
 		MatSliderModule,
 		DurationInputComponent,
+		TimerTextDisplayComponent,
 	],
 	templateUrl: './TimerProgressBar.component.html',
 	styleUrl: './TimerProgressBar.component.scss',
@@ -106,7 +108,6 @@ export class TimerProgressBarComponent implements AfterViewInit
 		{
 			this[key].valueChanges.subscribe(value =>
 			{
-				console.log(`formControl[${key}]`, value)
 				store.update({ [key]: value })
 			})
 		}
@@ -156,11 +157,9 @@ export class TimerProgressBarComponent implements AfterViewInit
 
 	onSecondsChanged(seconds)
 	{
-		console.log('total seconds', seconds)
 		this.store.setTotalSeconds(seconds)
 		for (const k of ['minutes', 'seconds'] as const)
 		{
-			console.log(k, this.store[k]())
 			this[k].setValue(this.store[k]())
 		}
 	}

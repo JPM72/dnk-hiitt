@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { computed } from '@angular/core'
 import { patchState, signalStore, withState, withComputed, withMethods } from '@ngrx/signals'
-import { formatTime, getTimeIntervals } from '@/libs/utils'
+import { formatTime, decomposeDuration } from '@/libs/utils'
 import { Howl } from 'howler'
 
 interface AudioMarker
@@ -178,8 +178,7 @@ export const TimerStore = signalStore(
 		},
 		setTotalSeconds(totalSeconds: number)
 		{
-			const { hours, minutes, seconds } = getTimeIntervals(totalSeconds * 1e3)
-			console.log({ totalSeconds, hours, minutes, seconds })
+			const { hours, minutes, seconds } = decomposeDuration(totalSeconds * 1e3)
 			this.update({
 				minutes: minutes + hours * 60,
 				seconds,

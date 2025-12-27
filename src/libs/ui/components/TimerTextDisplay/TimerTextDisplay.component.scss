@@ -1,0 +1,11 @@
+@use '@angular/material' as mat;
+
+:host {
+	font-size: 4rem;
+	font-variant-numeric: tabular-nums;
+
+	.timer-text__milliseconds {
+		font-size: 3rem;
+		opacity: 0.5;
+	}
+}

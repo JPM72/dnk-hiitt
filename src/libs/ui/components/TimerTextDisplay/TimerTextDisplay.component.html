@@ -1,0 +1,5 @@
+<span>{{ time().minutes }}</span>
+<span>:{{ time().seconds }}</span>
+@if (showMilliseconds()) {
+<span class="timer-text__milliseconds">.{{ time().milliseconds }}</span>
+}
