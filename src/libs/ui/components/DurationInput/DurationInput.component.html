@@ -1,14 +1,15 @@
-<mat-form-field class="overlay">
+<mat-form-field class="overlay" subscriptSizing="dynamic">
 	<input
 		matInput
 		readonly="true"
 		type="text"
 		inputmode="numeric"
 		autocomplete="off"
+		tabindex="-1"
 		[formControl]="overlay"
 	/>
 </mat-form-field>
-<mat-form-field>
+<mat-form-field subscriptSizing="dynamic">
 	<input
 		matInput
 		type="text"
@@ -19,4 +20,3 @@
 		(blur)="onBlur($event)"
 	/>
 </mat-form-field>
-{{ seconds() }}

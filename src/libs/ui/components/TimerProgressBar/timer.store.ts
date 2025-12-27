@@ -35,7 +35,7 @@ const AUDIO_MARKERS = {
 
 const BASE_AUDIO_MARKERS = [
 	// ...AUDIO_MARKERS.kettlebell,
- 	...AUDIO_MARKERS.stepping,
+	...AUDIO_MARKERS.stepping,
 ]
 
 type TimerState = {
@@ -248,7 +248,6 @@ export const TimerStore = signalStore(
 				const cutoff = intervalDuration - current
 
 				const [toPlay, markers] = _.partition(audioMarkers, ({ offset }) => cutoff <= offset)
-				console.log(audioVolume)
 				for (const { name } of toPlay) markerPlayer.play(name, audioVolume)
 				return { audioMarkers: markers }
 			})

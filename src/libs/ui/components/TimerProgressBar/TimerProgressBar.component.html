@@ -1,51 +1,76 @@
-<app-duration-input (secondsChanged)="onSecondsChanged($event)" />
 <div class="input-group">
-	<mat-form-field>
-		<input matInput type="number" inputmode="numeric" placeholder="0" min="0" max="59" [formControl]="minutes"
-			class="input-group__input" />
-		<span matTextSuffix>minutes</span>
-	</mat-form-field>
-	<mat-form-field>
-		<input matInput type="number" inputmode="numeric" placeholder="0" min="0" max="59" [formControl]="seconds" />
-		<span matTextSuffix>seconds</span>
-	</mat-form-field>
-	<mat-form-field>
-		<input matInput type="number" inputmode="numeric" placeholder="0" min="0" [formControl]="rounds" />
-		<span matTextSuffix>rounds</span>
-	</mat-form-field>
+  <mat-form-field>
+    <input
+      matInput
+      type="number"
+      inputmode="numeric"
+      placeholder="0"
+      min="0"
+      max="59"
+      [formControl]="minutes"
+      class="input-group__input"
+    />
+    <span matTextSuffix>minutes</span>
+  </mat-form-field>
+  <mat-form-field>
+    <input
+      matInput
+      type="number"
+      inputmode="numeric"
+      placeholder="0"
+      min="0"
+      max="59"
+      [formControl]="seconds"
+    />
+    <span matTextSuffix>seconds</span>
+  </mat-form-field>
+  <mat-form-field>
+    <input
+      matInput
+      type="number"
+      inputmode="numeric"
+      placeholder="0"
+      min="0"
+      [formControl]="rounds"
+    />
+    <span matTextSuffix>rounds</span>
+  </mat-form-field>
 </div>
 <div class="timer-container">
-	<div class="progress-spinner-container">
-		<mat-progress-spinner mode="determinate" value="100" class="background-spinner" />
-		<mat-progress-spinner mode="determinate" [value]="store.progress()" />
-		<app-segmented-circular-progress
-			[steps]="store.rounds()"
-			[step]="store.currentRound()"
-			[style.display]="store.rounds() ? '' : 'none'"
-		/>
-		<div class="timer-display">
-			<div class="timer-text">
+  <div class="progress-spinner-container">
+    <mat-progress-spinner
+      mode="determinate"
+      value="100"
+      class="background-spinner"
+    />
+    <mat-progress-spinner mode="determinate" [value]="store.progress()" />
+    <app-segmented-circular-progress
+      [steps]="store.rounds()"
+      [step]="store.currentRound()"
+      [style.display]="store.rounds() ? '' : 'none'"
+    />
+    <div class="timer-display">
+      <!-- <div class="timer-text">
 				<span>{{ store.timeText().minutes }}</span>
 				<span>:{{ store.timeText().seconds }}</span>
 				<span class="timer-text__milliseconds">.{{ store.timeText().milliseconds }}</span>
-			</div>
-			<div class="timer-text rounds-text">{{ roundsText() }}</div>
-		</div>
-	</div>
+			</div> -->
+      <app-duration-input (secondsChanged)="onSecondsChanged($event)" />
+      <div class="timer-text rounds-text">{{ roundsText() }}</div>
+    </div>
+  </div>
 </div>
 <div class="button-group">
-	<button mat-fab aria-label="Start" (click)="store.play()">
-		<mat-icon>
-			@if (store.isPaused()) {play_arrow} @else {pause}
-		</mat-icon>
-	</button>
-	<button mat-fab aria-label="Stop" (click)="reset()">
-		<mat-icon>stop</mat-icon>
-	</button>
+  <button mat-fab aria-label="Start" (click)="store.play()">
+    <mat-icon> @if (store.isPaused()) {play_arrow} @else {pause} </mat-icon>
+  </button>
+  <button mat-fab aria-label="Stop" (click)="reset()">
+    <mat-icon>stop</mat-icon>
+  </button>
 </div>
 <div class="volume-slider-container">
-	<mat-icon fontIcon="volume_up" />
-	<mat-slider class="volume-slider" min="0" max="1" step="0.01" value="0.5">
-		<input matSliderThumb [formControl]="audioVolume" #slider>
-	</mat-slider>
+  <mat-icon fontIcon="volume_up" />
+  <mat-slider class="volume-slider" min="0" max="1" step="0.01" value="0.5">
+    <input matSliderThumb [formControl]="audioVolume" #slider />
+  </mat-slider>
 </div>

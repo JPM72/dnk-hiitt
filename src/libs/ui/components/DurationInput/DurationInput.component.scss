@@ -6,13 +6,13 @@
 	@include mat.form-field-overrides(
 		(
 			filled-container-color: transparent,
-			// filled-caret-color: transparent,
-			container-vertical-padding: 1rem,
-			container-text-font: var(--mat-sys-display-medium-font),
-			container-text-line-height: var(--mat-sys-display-medium-line-height),
-			container-text-size: var(--mat-sys-display-medium-size),
-			container-text-tracking: var(--mat-sys-display-medium-tracking),
-			container-text-weight: var(--mat-sys-display-medium-weight)
+			filled-active-indicator-color: transparent,
+			container-vertical-padding: 0.5rem,
+			container-text-font: var(--mat-sys-display-large-font),
+			container-text-line-height: var(--mat-sys-display-large-line-height),
+			container-text-size: var(--mat-sys-display-large-size),
+			container-text-tracking: var(--mat-sys-display-large-tracking),
+			container-text-weight: var(--mat-sys-display-large-weight)
 		)
 	);
 
@@ -21,5 +21,14 @@
 		top: 0;
 		left: 0;
 		pointer-events: none;
+	}
+}
+
+:host ::ng-deep .mat-mdc-form-field-infix {
+	max-width: none;
+	width: 14rem;
+
+	input[matInput] {
+		text-align: center;
 	}
 }
