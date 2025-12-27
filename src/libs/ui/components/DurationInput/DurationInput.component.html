@@ -1,8 +1,22 @@
-<input
-	type="text"
-	inputmode="numeric"
-	autocomplete="off"
-	[formControl]="control"
-	(beforeinput)="onBeforeInput($event)"
-/>
-<p>{{ value }}</p>
+<mat-form-field class="overlay">
+	<input
+		matInput
+		readonly="true"
+		type="text"
+		inputmode="numeric"
+		autocomplete="off"
+		[formControl]="overlay"
+	/>
+</mat-form-field>
+<mat-form-field>
+	<input
+		matInput
+		type="text"
+		inputmode="numeric"
+		autocomplete="off"
+		[formControl]="control"
+		(beforeinput)="onBeforeInput($event)"
+		(blur)="onBlur($event)"
+	/>
+</mat-form-field>
+{{ seconds() }}

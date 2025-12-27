@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { computed } from '@angular/core'
 import { patchState, signalStore, withState, withComputed, withMethods } from '@ngrx/signals'
-import { formatTime } from '@/libs/utils'
+import { formatTime, getTimeIntervals } from '@/libs/utils'
 import { Howl } from 'howler'
 
 interface AudioMarker
@@ -10,19 +10,32 @@ interface AudioMarker
 	name: string
 }
 
+const AUDIO_MARKERS = {
+	kettlebell: [
+		{
+			name: 'thirty.mp3',
+			offset: 30e3,
+		},
+		{
+			name: 'fifteen.mp3',
+			offset: 15e3,
+		},
+		{
+			name: 'beeping-5-countdown.mp3',
+			offset: 5e3,
+		},
+	],
+	stepping: [
+		{
+			name: 'beep.mp3',
+			offset: 5e3,
+		},
+	]
+}
+
 const BASE_AUDIO_MARKERS = [
-	{
-		name: 'thirty.mp3',
-		offset: 30e3,
-	},
-	{
-		name: 'fifteen.mp3',
-		offset: 15e3,
-	},
-	{
-		name: 'beeping-5-countdown.mp3',
-		offset: 5e3,
-	},
+	// ...AUDIO_MARKERS.kettlebell,
+ 	...AUDIO_MARKERS.stepping,
 ]
 
 type TimerState = {
@@ -35,6 +48,7 @@ type TimerState = {
 	rounds: number | null
 	currentRound: number
 	audioMarkers: AudioMarker[]
+	audioVolume: number
 }
 
 const initialState: TimerState = {
@@ -47,6 +61,7 @@ const initialState: TimerState = {
 	rounds: null,
 	currentRound: 0,
 	audioMarkers: [...BASE_AUDIO_MARKERS],
+	audioVolume: 0.5,
 }
 
 
@@ -54,11 +69,6 @@ const TICK_INTERVAL = 16
 const setInterval = function (...args: Parameters<typeof window.setInterval>)
 {
 	return window.setInterval(...args) as unknown as number
-}
-const playMarker = (marker: AudioMarker) =>
-{
-	const sound = new Howl({ src: [`/sounds/${marker.name}`] })
-	sound.play()
 }
 
 const markerPlayer = {
@@ -70,10 +80,14 @@ const markerPlayer = {
 		_.invoke(howl, 'unload')
 		this.howl = null
 	},
-	play(name: string)
+	play(name: string, volume = 1)
 	{
 		this.stop()
-		this.howl = new Howl({ src: [`/sounds/${name}`] })
+		this.howl = new Howl({
+			src: [`/sounds/${name}`],
+			html5: true,
+			volume,
+		})
 		this.howl.play()
 	}
 }
@@ -143,18 +157,6 @@ export const TimerStore = signalStore(
 
 				if (rounds && currentRound >= rounds) this.stop()
 			}
-
-
-
-			// if (store.currentRound() !== prevRound) console.log(prevRound, store.currentRound())
-
-			// if (rounds)
-			// {
-			// 	const currentRound = store.currentRound()
-			// 	if (currentRound >= rounds) this.stop()
-			// }
-
-			// if (rounds && store.currentRound() >= rounds) this.stop()
 		},
 		updateIntervalId(...args: Parameters<typeof setInterval> | []): void
 		{
@@ -173,6 +175,15 @@ export const TimerStore = signalStore(
 		update(values: Partial<TimerState>)
 		{
 			patchState(store, values)
+		},
+		setTotalSeconds(totalSeconds: number)
+		{
+			const { hours, minutes, seconds } = getTimeIntervals(totalSeconds * 1e3)
+			console.log({ totalSeconds, hours, minutes, seconds })
+			this.update({
+				minutes: minutes + hours * 60,
+				seconds,
+			})
 		},
 		start(): void
 		{
@@ -220,7 +231,6 @@ export const TimerStore = signalStore(
 			patchState(store, () =>
 			{
 				const intervalDuration = store.intervalDuration()
-				console.log(intervalDuration)
 				return {
 					audioMarkers: _.filter(
 						[...BASE_AUDIO_MARKERS],
@@ -231,14 +241,15 @@ export const TimerStore = signalStore(
 		},
 		playMarkers(): void
 		{
-			patchState(store, ({ audioMarkers }) =>
+			patchState(store, ({ audioMarkers, audioVolume }) =>
 			{
 				const current = store.currentTime()
 				const intervalDuration = store.intervalDuration()
 				const cutoff = intervalDuration - current
 
 				const [toPlay, markers] = _.partition(audioMarkers, ({ offset }) => cutoff <= offset)
-				for (const { name } of toPlay) markerPlayer.play(name)
+				console.log(audioVolume)
+				for (const { name } of toPlay) markerPlayer.play(name, audioVolume)
 				return { audioMarkers: markers }
 			})
 		},

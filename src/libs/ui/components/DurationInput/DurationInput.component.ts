@@ -1,44 +1,16 @@
 import
 {
 	Component,
-	computed,
-	ElementRef, ViewChild
+	signal, output, effect
 } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormControl, ReactiveFormsModule } from '@angular/forms'
-import { IMask, IMaskModule, IMaskDirective, } from 'angular-imask'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatInputModule } from '@angular/material/input'
 import _ from 'lodash'
 
-const parseMask = (str: string) =>
-{
-	console.log(str)
-	const [min, sec] = str.split(':', 2).map(s => _.defaultTo(_.toInteger(s), 0))
-	const v = min * 60 + sec
-	console.log(v)
-	return v
-}
-
-const MASK_OPTIONS = {
-	mask: 'mm\\:ss',
-	placeholderChar: '0',
-	// lazy: false,
-	// overwrite: true,
-	blocks: {
-		mm: {
-			mask: IMask.MaskedRange,
-			from: 0, to: 59,
-			maxLength: 2,
-		},
-		ss: {
-			mask: IMask.MaskedRange,
-			from: 0, to: 59,
-			maxLength: 2,
-		},
-	}
-}
-
 const pad = (s) => _.padStart(s, 2, '0')
-const formatValue = ($seconds: number | null) =>
+const formatTime = ($seconds: number | null) =>
 {
 	if (!$seconds) return '00:00:00'
 	const hours = _.toInteger($seconds / 3600)
@@ -46,32 +18,48 @@ const formatValue = ($seconds: number | null) =>
 	const seconds = _.toInteger($seconds % 60)
 	return [hours, minutes, seconds].map(pad).join(':')
 }
-const parseSeconds = (str: string) =>
+const parseIntervals = (str: string) =>
 {
 	const [hours = 0, minutes = 0, seconds = 0] = str.split(':', 3).map(_.toInteger)
+	return { hours, minutes, seconds }
+}
+const parseSeconds = (str: string) =>
+{
+	const { hours, minutes, seconds } = parseIntervals(str)
 	return hours * 3600 + minutes * 60 + seconds
 }
 
 @Component({
 	selector: 'app-duration-input',
-	imports: [CommonModule, IMaskModule, ReactiveFormsModule],
+	imports: [
+		CommonModule,
+		ReactiveFormsModule,
+		MatFormFieldModule, MatInputModule,
+	],
 	templateUrl: './DurationInput.component.html',
 	styleUrl: './DurationInput.component.scss',
 })
 export class DurationInputComponent
 {
-
-	value
+	seconds = signal(0)
 	control = new FormControl<string>('00:00:00')
-	// mask = MASK_OPTIONS
-	// @ViewChild(IMaskDirective, { static: false })
-	// iMask: IMaskDirective<typeof MASK_OPTIONS>
+	overlay = new FormControl<string>('')
+
+	secondsChanged = output<number>()
 
 	constructor()
 	{
-		// this.elementRef = elementRef
-		// this.directiveRef = directiveRef
-		this.control.valueChanges.subscribe(console.log)
+		const { control, seconds, secondsChanged } = this
+		control.valueChanges.subscribe(value => seconds.set(parseSeconds(value)))
+		effect(() => secondsChanged.emit(seconds()))
+	}
+
+	private setFormattedValue(value = this.control.value)
+	{
+		const { control } = this
+		const raw = control.value
+		const formatted = formatTime(parseSeconds(raw))
+		control.setValue(formatted)
 	}
 
 	onBeforeInput(event)
@@ -97,51 +85,11 @@ export class DurationInputComponent
 		).map(
 			a => _.join(a, '')
 		).join(':').value()
-
-		const seconds = parseSeconds(str)
-		this.value = seconds
-
-		// target.value = str
 		this.control.setValue(str)
-		console.log(this.control.getRawValue())
 	}
 
-	onInput(event)
+	onBlur(event)
 	{
-		console.log(event)
+		this.setFormattedValue()
 	}
-	onSelect(event)
-	{
-		console.log(event)
-	}
-	onKeyDown(event)
-	{
-		console.log(event)
-	}
-
-	// onAccept(value)
-	// {
-	// 	console.log('on accept', ...arguments)
-	// 	console.log(this)
-	// }
-	// onComplete()
-	// {
-	// 	console.log('on complete', ...arguments)
-	// }
-
-	// ngAfterViewInit(): void
-	// {
-	// 	this.iMask.maskRef.updateOptions(
-	// 		_.merge({}, MASK_OPTIONS, {
-	// 			blocks: {
-	// 				mm: {
-	// 					autofix: 'pad',
-	// 				},
-	// 				ss: {
-	// 					autofix: 'pad',
-	// 				},
-	// 			}
-	// 		} as any)
-	// 	)
-	// }
 }

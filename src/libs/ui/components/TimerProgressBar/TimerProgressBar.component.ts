@@ -16,6 +16,7 @@ import { MatFabButton, MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
+import { MatSliderModule } from '@angular/material/slider'
 import { FormControl, ReactiveFormsModule } from '@angular/forms'
 import { WakeLockService } from '@/libs/services'
 import { DurationInputComponent } from '../DurationInput/DurationInput.component'
@@ -30,14 +31,15 @@ const customSpinnerOptions: MatProgressSpinnerDefaultOptions = {
 @Component({
 	selector: 'app-timer-progress-bar',
 	imports: [
-    CommonModule,
-    MatProgressSpinnerModule,
-    MatButtonModule, MatIconModule,
-    MatFormFieldModule, MatInputModule,
-    ReactiveFormsModule,
-    SegmentedCircularProgressComponent,
-    // DurationInputComponent
-],
+		CommonModule,
+		MatProgressSpinnerModule,
+		MatButtonModule, MatIconModule,
+		MatFormFieldModule, MatInputModule,
+		ReactiveFormsModule,
+		SegmentedCircularProgressComponent,
+		MatSliderModule,
+		DurationInputComponent,
+	],
 	templateUrl: './TimerProgressBar.component.html',
 	styleUrl: './TimerProgressBar.component.scss',
 	providers: [
@@ -57,6 +59,7 @@ export class TimerProgressBarComponent implements AfterViewInit
 	minutes = new FormControl<number>(null)
 	seconds = new FormControl<number>(null)
 	rounds = new FormControl<number>(null)
+	audioVolume = new FormControl<number>(0.5)
 
 	currentStep = computed(() => this.store.currentRound() + 1)
 
@@ -66,7 +69,6 @@ export class TimerProgressBarComponent implements AfterViewInit
 		if (!currentTime) return null
 
 		const rounds = this.store.rounds()
-		// const currentRound = this.store.currentRound() + 1
 		const currentRound = this.currentStep()
 
 		if (rounds === null)
@@ -99,9 +101,14 @@ export class TimerProgressBarComponent implements AfterViewInit
 
 		const { store } = this
 
-		for (const key of INPUT_KEYS)
+		// [...INPUT_KEYS, 'audioVolume']
+		for (const key of ['audioVolume'])
 		{
-			this[key].valueChanges.subscribe(value => store.update({ [key]: value }))
+			this[key].valueChanges.subscribe(value =>
+			{
+				console.log(`formControl[${key}]`, value)
+				store.update({ [key]: value })
+			})
 		}
 
 		effect(() =>
@@ -145,5 +152,16 @@ export class TimerProgressBarComponent implements AfterViewInit
 			const svg = spinner._determinateCircle.nativeElement.querySelector('svg')
 			svg.style.overflow = 'visible'
 		})
+	}
+
+	onSecondsChanged(seconds)
+	{
+		console.log('total seconds', seconds)
+		this.store.setTotalSeconds(seconds)
+		for (const k of ['minutes', 'seconds'] as const)
+		{
+			console.log(k, this.store[k]())
+			this[k].setValue(this.store[k]())
+		}
 	}
 }

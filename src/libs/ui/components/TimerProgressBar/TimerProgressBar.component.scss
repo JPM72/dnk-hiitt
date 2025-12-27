@@ -117,4 +117,10 @@
 			flex-shrink: 1;
 		}
 	}
+
+	.volume-slider-container {
+		display: flex;
+		align-items: center;
+		max-width: 10rem;
+	}
 }

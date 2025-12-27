@@ -1,9 +1,25 @@
+@use '@angular/material' as mat;
+
 :host {
-	input {
-		outline: 0;
-		border: none;
-		font-size: 2rem;
-		font-family: var(--mat-form-field-container-text-font, var(--mat-sys-body-large-font));
-		background-color: var(--mdc-filled-text-field-container-color, var(--mat-sys-surface-variant));
+	position: relative;
+
+	@include mat.form-field-overrides(
+		(
+			filled-container-color: transparent,
+			// filled-caret-color: transparent,
+			container-vertical-padding: 1rem,
+			container-text-font: var(--mat-sys-display-medium-font),
+			container-text-line-height: var(--mat-sys-display-medium-line-height),
+			container-text-size: var(--mat-sys-display-medium-size),
+			container-text-tracking: var(--mat-sys-display-medium-tracking),
+			container-text-weight: var(--mat-sys-display-medium-weight)
+		)
+	);
+
+	.overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		pointer-events: none;
 	}
 }

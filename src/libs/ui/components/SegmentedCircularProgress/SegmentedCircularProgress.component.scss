@@ -1,3 +1,5 @@
+@use "sass:string";
+
 // =========================
 // How it works
 // =========================
@@ -77,7 +79,7 @@
 	}
 
 	// Sass will for some reason quote the string, so unquote it before returing
-	@return unquote($dasharray);
+	@return string.unquote($dasharray);
 }
 
 :host {

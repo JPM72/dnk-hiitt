@@ -22,7 +22,10 @@
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"],
       "options": {
-        "allowedCommonJsDependencies": ["lodash"]
+        "allowedCommonJsDependencies": [
+			"lodash",
+			"howler"
+		]
       }
     },
     "@nx/eslint:lint": {
