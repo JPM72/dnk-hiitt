@@ -1,7 +1,9 @@
 import
 {
-	Component,
-	signal, output, effect
+	Component, effect,
+	input, model, signal, output,
+	viewChild,
+	type ElementRef
 } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormControl, ReactiveFormsModule } from '@angular/forms'
@@ -41,24 +43,31 @@ const parseSeconds = (str: string) =>
 })
 export class DurationInputComponent
 {
-	seconds = signal(0)
-	control = new FormControl<string>('00:00:00')
-	overlay = new FormControl<string>('')
+	seconds = model<number>(0)
 
-	secondsChanged = output<number>()
+	onEnterCallback = input<any>(_.noop)
+
+	control = new FormControl<string>('00:00:00')
+
+	controlRef = viewChild.required<ElementRef<HTMLInputElement>>('controlElement')
 
 	constructor()
 	{
-		const { control, seconds, secondsChanged } = this
+		const { control, seconds } = this
 		control.valueChanges.subscribe(value => seconds.set(parseSeconds(value)))
-		effect(() => secondsChanged.emit(seconds()))
+		effect(() => {
+			const value = seconds()
+			this.setFormattedValue(value)
+		})
 	}
 
-	private setFormattedValue(value = this.control.value)
+	private setFormattedValue(value: number | string = this.control.value)
 	{
 		const { control } = this
-		const raw = control.value
-		const formatted = formatTime(parseSeconds(raw))
+		const seconds = typeof value === 'string'
+			? parseSeconds(value)
+			: value
+		const formatted = formatTime(seconds)
 		control.setValue(formatted)
 	}
 
@@ -68,7 +77,18 @@ export class DurationInputComponent
 		let data = event.data, value = target.value
 
 		event.preventDefault()
-		if (data && !/^\d+$/.test(data))
+		if (inputType === 'insertLineBreak')
+		{
+			const ref = this.controlRef()
+			const el = ref?.nativeElement
+			if (el)
+			{
+				el.blur()
+				this.onEnterCallback()()
+			}
+			return
+		}
+		else if (data && !/^\d+$/.test(data))
 		{
 			return
 		} else if (data === null)

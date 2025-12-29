@@ -7,7 +7,7 @@ import
 	signal, ElementRef,
 	ChangeDetectionStrategy,
 	viewChildren,
-	AfterViewInit,
+	OnInit, AfterViewInit,
 } from '@angular/core'
 import { TimerStore } from './timer.store'
 import { CommonModule } from '@angular/common'
@@ -53,17 +53,15 @@ const customSpinnerOptions: MatProgressSpinnerDefaultOptions = {
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimerProgressBarComponent implements AfterViewInit
+export class TimerProgressBarComponent implements OnInit, AfterViewInit
 {
 	readonly store = inject(TimerStore)
 	readonly wakeLock = inject(WakeLockService)
-
-	minutes = new FormControl<number>(null)
-	seconds = new FormControl<number>(null)
 	rounds = new FormControl<number>(null)
 	audioVolume = new FormControl<number>(0.5)
 
 	currentStep = computed(() => this.store.currentRound() + 1)
+	currentSeconds = signal<number>(0)
 
 	roundsText = computed(() =>
 	{
@@ -89,6 +87,8 @@ export class TimerProgressBarComponent implements AfterViewInit
 
 	isResetting = signal<boolean>(false)
 
+	onEnterCallback: Function
+
 	constructor(elementRef: ElementRef)
 	{
 		this.elementRef = elementRef
@@ -99,9 +99,12 @@ export class TimerProgressBarComponent implements AfterViewInit
 			if (bar) bar.style.transition = this.isResetting() ? '' : 'none'
 		})
 
-		const INPUT_KEYS = ['minutes', 'seconds', 'rounds'] as const
+		const INPUT_KEYS = ['rounds'] as const
 
 		const { store } = this
+		if (typeof window !== 'undefined') Object.assign(window, {
+			store
+		})
 
 		// [...INPUT_KEYS, 'audioVolume']
 		for (const key of ['audioVolume'])
@@ -111,6 +114,12 @@ export class TimerProgressBarComponent implements AfterViewInit
 				store.update({ [key]: value })
 			})
 		}
+
+		effect(() =>
+		{
+			const seconds = store.currentSeconds()
+			this.currentSeconds.set(seconds)
+		})
 
 		effect(() =>
 		{
@@ -136,12 +145,9 @@ export class TimerProgressBarComponent implements AfterViewInit
 
 	}
 
-	reset()
+	ngOnInit(): void
 	{
-		this.isResetting.set(true)
-		this.store.stop()
-
-		setTimeout(() => this.isResetting.set(false), 32)
+		this.onEnterCallback = this.onDurationInputEnter.bind(this)
 	}
 
 	ngAfterViewInit()
@@ -155,12 +161,27 @@ export class TimerProgressBarComponent implements AfterViewInit
 		})
 	}
 
+	play()
+	{
+		this.store.play()
+		this.currentSeconds.set(this.store.currentSeconds())
+	}
+
+	reset()
+	{
+		this.isResetting.set(true)
+		this.store.stop()
+		this.currentSeconds.set((this.store.intervalDuration() / 1e3) | 0)
+		setTimeout(() => this.isResetting.set(false), 32)
+	}
+
 	onSecondsChanged(seconds)
 	{
 		this.store.setTotalSeconds(seconds)
-		for (const k of ['minutes', 'seconds'] as const)
-		{
-			this[k].setValue(this.store[k]())
-		}
+	}
+
+	onDurationInputEnter()
+	{
+		this.store.play()
 	}
 }

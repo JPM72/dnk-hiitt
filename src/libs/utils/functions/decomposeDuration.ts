@@ -1,6 +1,14 @@
 const { round } = Math
 
-export function decomposeDuration(totalMilliseconds: number)
+export interface DecomposedDuration
+{
+	hours: number
+	minutes: number
+	seconds: number
+	milliseconds: number
+}
+
+export function decomposeDuration(totalMilliseconds: number): DecomposedDuration
 {
 	const t = round(totalMilliseconds)
 	const hours = t / 3600e3 | 0

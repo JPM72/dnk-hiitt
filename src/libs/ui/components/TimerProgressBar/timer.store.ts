@@ -39,12 +39,11 @@ const BASE_AUDIO_MARKERS = [
 ]
 
 type TimerState = {
+	intervalDuration: number | null
 	startTime: number | null
 	accumulatedTime: number
 	elapsedTime: number | null
 	intervalId: number | null
-	minutes: number | null
-	seconds: number | null
 	rounds: number | null
 	currentRound: number
 	audioMarkers: AudioMarker[]
@@ -52,12 +51,11 @@ type TimerState = {
 }
 
 const initialState: TimerState = {
+	intervalDuration: null,
 	startTime: null,
 	accumulatedTime: 0,
 	elapsedTime: null,
 	intervalId: null,
-	minutes: null,
-	seconds: null,
 	rounds: null,
 	currentRound: 0,
 	audioMarkers: [...BASE_AUDIO_MARKERS],
@@ -96,14 +94,16 @@ export const TimerStore = signalStore(
 	withState(initialState),
 	withComputed(({
 		elapsedTime, accumulatedTime, intervalId,
-		minutes, seconds,
 	}) => ({
 		isPaused: computed(() => typeof intervalId() !== 'number'),
 		currentTime: computed(() => accumulatedTime() + (elapsedTime() ?? 0)),
-		intervalDuration: computed(() => 1e3 * (60 * (minutes() ?? 0) + (seconds() ?? 0))),
 	})),
 	withComputed(({ currentTime, intervalDuration }) => ({
-		timeText: computed(() => formatTime(currentTime())),
+		currentSeconds: computed(() => (currentTime() / 1e3) | 0),
+		currentIntervals: computed(() => decomposeDuration(currentTime())),
+	})),
+	withComputed(({ currentTime, intervalDuration, currentIntervals }) => ({
+		timeText: computed(() => formatTime(currentIntervals())),
 		progress: computed(() =>
 		{
 			const duration = intervalDuration()
@@ -154,7 +154,6 @@ export const TimerStore = signalStore(
 			if (prevRound !== currentRound)
 			{
 				this.fillMarkers()
-
 				if (rounds && currentRound >= rounds) this.stop()
 			}
 		},
@@ -178,10 +177,8 @@ export const TimerStore = signalStore(
 		},
 		setTotalSeconds(totalSeconds: number)
 		{
-			const { hours, minutes, seconds } = decomposeDuration(totalSeconds * 1e3)
 			this.update({
-				minutes: minutes + hours * 60,
-				seconds,
+				intervalDuration: totalSeconds * 1e3,
 			})
 		},
 		start(): void
@@ -221,7 +218,7 @@ export const TimerStore = signalStore(
 		reset(): void
 		{
 			patchState(store, {
-				minutes: null, seconds: null, rounds: null,
+				intervalDuration: null, rounds: null,
 			})
 			this.fillMarkers()
 		},

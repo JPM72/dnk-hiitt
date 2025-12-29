@@ -6,31 +6,6 @@
 			inputmode="numeric"
 			placeholder="0"
 			min="0"
-			max="59"
-			[formControl]="minutes"
-			class="input-group__input"
-		/>
-		<span matTextSuffix>minutes</span>
-	</mat-form-field>
-	<mat-form-field>
-		<input
-			matInput
-			type="number"
-			inputmode="numeric"
-			placeholder="0"
-			min="0"
-			max="59"
-			[formControl]="seconds"
-		/>
-		<span matTextSuffix>seconds</span>
-	</mat-form-field>
-	<mat-form-field>
-		<input
-			matInput
-			type="number"
-			inputmode="numeric"
-			placeholder="0"
-			min="0"
 			[formControl]="rounds"
 		/>
 		<span matTextSuffix>rounds</span>
@@ -50,8 +25,21 @@
 			[style.display]="store.rounds() ? '' : 'none'"
 		/>
 		<div class="timer-display">
+			<!-- <app-duration-input
+				[(seconds)]="currentSeconds"
+				(secondsChange)="onSecondsChanged($event)"
+				[onEnterCallback]="onEnterCallback"
+			/>
+			<app-timer-text-display
+				[milliseconds]="store.currentTime()"
+				[showMilliseconds]="false"
+			/> -->
 			@if (store.isPaused()) {
-			<app-duration-input (secondsChanged)="onSecondsChanged($event)" />
+			<app-duration-input
+				[(seconds)]="currentSeconds"
+				(secondsChange)="onSecondsChanged($event)"
+				[onEnterCallback]="onEnterCallback"
+			/>
 			} @else {
 			<app-timer-text-display
 				[milliseconds]="store.currentTime()"
@@ -63,7 +51,7 @@
 	</div>
 </div>
 <div class="button-group">
-	<button mat-fab aria-label="Start" (click)="store.play()">
+	<button mat-fab aria-label="Start" (click)="play()">
 		<mat-icon> @if (store.isPaused()) {play_arrow} @else {pause} </mat-icon>
 	</button>
 	<button mat-fab aria-label="Stop" (click)="reset()">

@@ -1,20 +1,11 @@
-<mat-form-field class="overlay" subscriptSizing="dynamic">
-	<input
-		matInput
-		readonly="true"
-		type="text"
-		inputmode="numeric"
-		autocomplete="off"
-		tabindex="-1"
-		[formControl]="overlay"
-	/>
-</mat-form-field>
 <mat-form-field subscriptSizing="dynamic">
 	<input
 		matInput
 		type="text"
 		inputmode="numeric"
 		autocomplete="off"
+		data-control-type="control"
+		#controlElement
 		[formControl]="control"
 		(beforeinput)="onBeforeInput($event)"
 		(blur)="onBlur($event)"
