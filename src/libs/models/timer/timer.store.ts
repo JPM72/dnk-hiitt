@@ -85,6 +85,7 @@ const markerPlayer = {
 			src: [`/sounds/${name}`],
 			html5: true,
 			volume,
+
 		})
 		this.howl.play()
 	}

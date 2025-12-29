@@ -9,7 +9,7 @@ import
 	viewChildren,
 	OnInit, AfterViewInit,
 } from '@angular/core'
-import { TimerStore } from './timer.store'
+import { TimerStore } from '@/models/timer/timer.store'
 import { CommonModule } from '@angular/common'
 import { MatProgressSpinner, MatProgressSpinnerModule, MatProgressSpinnerDefaultOptions, MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS } from '@angular/material/progress-spinner'
 import { MatFabButton, MatButtonModule } from '@angular/material/button'
@@ -106,7 +106,6 @@ export class TimerProgressBarComponent implements OnInit, AfterViewInit
 			store
 		})
 
-		// [...INPUT_KEYS, 'audioVolume']
 		for (const key of ['audioVolume'])
 		{
 			this[key].valueChanges.subscribe(value =>
