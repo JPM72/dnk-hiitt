@@ -1,0 +1,81 @@
+:host {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 2;
+	color: var(--mat-sys-primary);
+	background: var(--mat-sys-primary-container);
+}
+
+.navbar-header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	padding: 0.5rem 1rem;
+
+	> .mat-mdc-button {
+		&:last-child {
+			margin-left: auto;
+		}
+	}
+
+	.navbar-header-item-selected {
+		background: color-mix(in srgb, var(--mat-sys-primary) 10%, transparent);
+	}
+}
+
+.mat-mdc-icon-button {
+	color: inherit;
+}
+
+.github-logo {
+	margin-right: 0.5rem;
+	width: 1.5rem;
+	height: 1.5rem;
+}
+
+.flex-spacer {
+	flex-grow: 1;
+}
+
+.navbar-link {
+	text-decoration: inherit;
+	flex: 1;
+}
+
+.navbar {
+	display: none;
+}
+
+.navbar-show-small {
+	display: none;
+}
+
+.skip-link-wrapper {
+	position: absolute;
+	top: 10px;
+	left: 50%;
+	transform: translateX(-50%);
+	border-radius: 5px;
+}
+
+// Rules for when the device is detected to be a small screen.
+// Moves content two rows instead of one.
+@media (max-width: 720px) {
+	.navbar-hide-small {
+		display: none;
+	}
+
+	.navbar-show-small {
+		display: block;
+	}
+
+	.navbar {
+		display: flex;
+	}
+
+	.github-logo {
+		margin: 0;
+	}
+}
