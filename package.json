@@ -27,7 +27,8 @@
     "howler": "github:keiththomas1/howler.js#master",
     "lodash": "^4.17.21",
     "rxjs": "~7.8.2",
-    "zone.js": "^0.16.0"
+    "zone.js": "^0.16.0",
+    "@ngrx/entity": "^21.0.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~21.0.4",
@@ -38,6 +39,7 @@
     "@angular/language-service": "~21.0.6",
     "@angular/material": "^21.0.5",
     "@eslint/js": "^9.39.2",
+    "@ngrx/entity": "^21.0.1",
     "@ngrx/signals": "^21.0.1",
     "@nx/angular": "22.3.3",
     "@nx/devkit": "22.3.3",

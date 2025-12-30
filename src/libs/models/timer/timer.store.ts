@@ -3,32 +3,29 @@ import { computed } from '@angular/core'
 import { patchState, signalStore, withState, withComputed, withMethods } from '@ngrx/signals'
 import { formatTime, decomposeDuration } from '@/libs/utils'
 import { Howl } from 'howler'
+import type { TimerState } from './timer.model'
+import type { AudioMarker } from '../audio-marker/audio-marker.model'
 
-interface AudioMarker
-{
-	offset: number
-	name: string
-}
 
 const AUDIO_MARKERS = {
 	kettlebell: [
 		{
-			name: 'thirty.mp3',
-			offset: 30e3,
+			offset: -30e3,
+			options: { src: 'thirty.mp3', }
 		},
 		{
-			name: 'fifteen.mp3',
-			offset: 15e3,
+			offset: -15e3,
+			options: { src: 'fifteen.mp3', }
 		},
 		{
-			name: 'beeping-5-countdown.mp3',
-			offset: 5e3,
+			offset: -5e3,
+			options: { src: 'beeping-5-countdown.mp3', }
 		},
 	],
 	stepping: [
 		{
-			name: 'beep.mp3',
-			offset: 5e3,
+			offset: -5e3,
+			options: { src: 'beep.mp3', }
 		},
 	]
 }
@@ -38,17 +35,7 @@ const BASE_AUDIO_MARKERS = [
 	...AUDIO_MARKERS.stepping,
 ]
 
-type TimerState = {
-	intervalDuration: number | null
-	startTime: number | null
-	accumulatedTime: number
-	elapsedTime: number | null
-	intervalId: number | null
-	rounds: number | null
-	currentRound: number
-	audioMarkers: AudioMarker[]
-	audioVolume: number
-}
+
 
 const initialState: TimerState = {
 	intervalDuration: null,
@@ -86,6 +73,15 @@ const markerPlayer = {
 			html5: true,
 			volume,
 
+		})
+		this.howl.play()
+	},
+	playMarker(marker: AudioMarker)
+	{
+		this.stop()
+		this.howl = new Howl({
+			volume: 1,
+			...marker.options
 		})
 		this.howl.play()
 	}
@@ -244,8 +240,18 @@ export const TimerStore = signalStore(
 				const intervalDuration = store.intervalDuration()
 				const cutoff = intervalDuration - current
 
-				const [toPlay, markers] = _.partition(audioMarkers, ({ offset }) => cutoff <= offset)
-				for (const { name } of toPlay) markerPlayer.play(name, audioVolume)
+				const [toPlay, markers] = _.partition(
+					audioMarkers,
+					({ offset }) => cutoff <= (offset as number)
+				)
+				for (const { offset, options } of toPlay) markerPlayer.playMarker({
+					offset,
+					options: {
+						...options,
+						volume: audioVolume
+					}
+				})
+
 				return { audioMarkers: markers }
 			})
 		},

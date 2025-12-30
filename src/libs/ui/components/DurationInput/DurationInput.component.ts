@@ -1,7 +1,7 @@
 import
 {
 	Component, effect,
-	input, model, signal, output,
+	input, model,
 	viewChild,
 	type ElementRef
 } from '@angular/core'

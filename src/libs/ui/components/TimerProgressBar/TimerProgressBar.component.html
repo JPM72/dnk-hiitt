@@ -25,15 +25,6 @@
 			[style.display]="store.rounds() ? '' : 'none'"
 		/>
 		<div class="timer-display">
-			<!-- <app-duration-input
-				[(seconds)]="currentSeconds"
-				(secondsChange)="onSecondsChanged($event)"
-				[onEnterCallback]="onEnterCallback"
-			/>
-			<app-timer-text-display
-				[milliseconds]="store.currentTime()"
-				[showMilliseconds]="false"
-			/> -->
 			@if (store.isPaused()) {
 			<app-duration-input
 				[(seconds)]="currentSeconds"
