@@ -1,13 +1,16 @@
 import type { Segment } from './segment.model'
+import { computed } from '@angular/core'
 import
 {
 	patchState,
 	signalStore,
 	type,
+	withComputed,
 	withMethods,
 } from '@ngrx/signals'
 import
 {
+	type EntityId,
 	entityConfig,
 	withEntities,
 	addEntity,
@@ -26,8 +29,21 @@ import
 	removeEntities,
 	removeAllEntities,
 } from '@ngrx/signals/entities'
+import _ from 'lodash'
 
 const selectId = ({ id }: Segment) => id
+
+let _id = 0
+const defaults = (segment: Partial<Segment> = {}): Segment => {
+	const instance = _.defaults({}, segment, {
+		duration: 60e3,
+		label: null,
+		repeat: null,
+		sounds: []
+	})
+	instance.id ??= `segment-${++_id}`
+	return instance as Segment
+}
 
 const segmentConfig = entityConfig({
 	entity: type<Segment>(),
@@ -40,6 +56,12 @@ type EntityPredicate<Entity> = (entity: Entity) => boolean;
 export const SegmentsStore = signalStore(
 	withEntities(segmentConfig),
 	withMethods((store) => ({
+		createOne(payload: Partial<Segment>): Segment
+		{
+			const instance = defaults(payload)
+			patchState(store, addEntity(instance, segmentConfig))
+			return instance
+		},
 		addOne(payload: Segment): void
 		{
 			patchState(store, addEntity(payload, segmentConfig))

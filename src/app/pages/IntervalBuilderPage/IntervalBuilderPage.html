@@ -1,1 +1,8 @@
-<p>IntervalBuilderPage works!</p>
+@for (segment of store.segmentEntities(); track segment.id) {
+<mat-card appearance="outlined">
+	<mat-card-content>
+		<p>Duration: {{segment.duration}}</p>
+		<p>Label: {{segment.label}}</p>
+	</mat-card-content>
+</mat-card>
+}
