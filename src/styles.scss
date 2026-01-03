@@ -5,11 +5,15 @@ html {
 	color-scheme: light dark;
 	@include mat.theme(
 		(
-			color: mat.$cyan-palette,
+			color: (
+				primary: mat.$cyan-palette,
+				tertiary: mat.$orange-palette
+			),
 			typography: Roboto,
 			density: 0
 		)
 	);
+	@include mat.system-classes();
 }
 
 body {
@@ -28,7 +32,7 @@ $navbar-height: 56px;
 .page-container {
 	display: block;
 	padding: 1rem;
-	width: 100vw;
+	width: calc(100vw - 2rem);
 	height: calc(100vh - $navbar-height);
 	top: $navbar-height;
 	position: fixed;
@@ -40,11 +44,11 @@ $navbar-height: 56px;
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+	-webkit-appearance: none;
+	margin: 0;
 }
 
 /* Firefox */
-input[type=number] {
-  -moz-appearance: textfield;
+input[type='number'] {
+	-moz-appearance: textfield;
 }

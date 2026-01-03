@@ -1,0 +1,24 @@
+<div class="button-group">
+	<button
+		mat-fab
+		[aria-label]="(isPaused() ? 'Start' : 'Pause')"
+		(click)="start.emit()"
+		[disabled]="isStartDisabled()"
+	>
+		<mat-icon>
+			@if (isPaused()) {
+				play_arrow
+			} @else {
+				pause
+			}
+		</mat-icon>
+	</button>
+	<button
+		mat-fab
+		aria-label="Stop"
+		[disabled]="isStopDisabled()"
+		(click)="stop.emit()"
+	>
+		<mat-icon>stop</mat-icon>
+	</button>
+</div>

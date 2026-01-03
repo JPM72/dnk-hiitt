@@ -1,11 +1,11 @@
 import _ from 'lodash'
 import { computed } from '@angular/core'
-import { patchState, signalStore, withState, withComputed, withMethods } from '@ngrx/signals'
+import { signalStore, patchState, withState, withComputed, withMethods } from '@ngrx/signals'
 import { formatTime, decomposeDuration } from '@/libs/utils'
 import { Howl } from 'howler'
 import type { TimerState } from './timer.model'
 import type { AudioMarker } from '../audio-marker/audio-marker.model'
-
+import { TICK_INTERVAL } from '@/app/app.constants'
 
 const AUDIO_MARKERS = {
 	kettlebell: [
@@ -49,13 +49,6 @@ const initialState: TimerState = {
 	audioVolume: 0.5,
 }
 
-
-const TICK_INTERVAL = 16
-const setInterval = function (...args: Parameters<typeof window.setInterval>)
-{
-	return window.setInterval(...args) as unknown as number
-}
-
 const markerPlayer = {
 	howl: null,
 	stop()
@@ -95,8 +88,8 @@ export const TimerStore = signalStore(
 		isPaused: computed(() => typeof intervalId() !== 'number'),
 		currentTime: computed(() => accumulatedTime() + (elapsedTime() ?? 0)),
 	})),
-	withComputed(({ currentTime, intervalDuration }) => ({
-		currentSeconds: computed(() => (currentTime() / 1e3) | 0),
+	withComputed(({ currentTime }) => ({
+		currentSeconds: computed(() => Math.floor(currentTime() / 1e3)),
 		currentIntervals: computed(() => decomposeDuration(currentTime())),
 	})),
 	withComputed(({ currentTime, intervalDuration, currentIntervals }) => ({

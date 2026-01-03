@@ -5,7 +5,6 @@ import
 	viewChild,
 	type ElementRef
 } from '@angular/core'
-import { CommonModule } from '@angular/common'
 import { FormControl, ReactiveFormsModule } from '@angular/forms'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
@@ -34,7 +33,6 @@ const parseSeconds = (str: string) =>
 @Component({
 	selector: 'app-duration-input',
 	imports: [
-		CommonModule,
 		ReactiveFormsModule,
 		MatFormFieldModule, MatInputModule,
 	],
@@ -44,8 +42,8 @@ const parseSeconds = (str: string) =>
 export class DurationInputComponent
 {
 	seconds = model<number>(0)
-
-	onEnterCallback = input<any>(_.noop)
+	label = input<string>()
+	onEnterCallback = input<Function>(_.noop)
 
 	control = new FormControl<string>('00:00:00')
 

@@ -1,0 +1,45 @@
+@use '@angular/material' as mat;
+
+:host {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+
+	.status-container {
+		display: flex;
+		justify-content: start;
+		column-gap: 2rem;
+	}
+
+	.progress-spinner-container {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+
+		.background-spinner {
+			position: absolute;
+			z-index: -1;
+			pointer-events: none;
+
+			@include mat.progress-spinner-overrides(
+				(
+					active-indicator-color: var(--mat-sys-surface-variant)
+				)
+			);
+		}
+
+		&[data-current-portion="rest"]
+		{
+			@include mat.progress-spinner-overrides(
+				(
+					active-indicator-color: var(--mat-sys-tertiary)
+				)
+			);
+		}
+	}
+}
+
+:host ::ng-deep mat-progress-spinner {
+	border-radius: 100%;
+}

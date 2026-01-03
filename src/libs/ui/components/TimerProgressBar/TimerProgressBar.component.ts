@@ -104,8 +104,8 @@ export class TimerProgressBarComponent implements OnInit, AfterViewInit
 		const INPUT_KEYS = ['rounds'] as const
 
 		const { store } = this
-		if (typeof window !== 'undefined') Object.assign(window, {
-			store
+		if (typeof window !== 'undefined') _.merge(window, {
+			timerStore: store
 		})
 
 		for (const key of ['audioVolume'])
@@ -172,7 +172,7 @@ export class TimerProgressBarComponent implements OnInit, AfterViewInit
 	{
 		this.isResetting.set(true)
 		this.store.stop()
-		this.currentSeconds.set((this.store.intervalDuration() / 1e3) | 0)
+		this.currentSeconds.set(Math.floor((this.store.intervalDuration() / 1e3)))
 		setTimeout(() => this.isResetting.set(false), 32)
 	}
 

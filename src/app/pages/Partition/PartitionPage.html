@@ -1,0 +1,42 @@
+<div class="duration-inputs">
+	<app-duration-input
+		label="Active"
+		[seconds]="activeDurationSeconds()"
+		(secondsChange)="onActiveDurationSecondsChange($event)"
+		[onEnterCallback]="onEnterCallback"
+	/>
+	<app-duration-input
+		label="Rest"
+		[seconds]="restDurationSeconds()"
+		(secondsChange)="onRestDurationSecondsChange($event)"
+		[onEnterCallback]="onEnterCallback"
+	/>
+</div>
+<div class="status-container">
+	<div
+		class="progress-spinner-container"
+		[attr.data-current-portion]="store.currentPortion()"
+	>
+		<mat-progress-spinner
+			diameter="{{PROGRESS_SPINNER_DIAMETER}}"
+			mode="determinate"
+			value="100"
+			class="background-spinner"
+		/>
+		<mat-progress-spinner
+			diameter="{{PROGRESS_SPINNER_DIAMETER}}"
+			mode="determinate"
+			[value]="store.progress()"
+		/>
+	</div>
+	<app-timer-text-display
+		[milliseconds]="store.currentTime()"
+		[showMilliseconds]="false"
+	/>
+</div>
+<app-timer-button-controls
+	[isPaused]="store.isPaused()"
+	[isDisabled]="buttonsDisabledState()"
+	(start)="onStart()"
+	(stop)="onStop()"
+/>
