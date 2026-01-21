@@ -4,6 +4,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { TimerButtonControlsComponent } from '@/libs/ui/components/TimerButtonControls/TimerButtonControls.component'
 import { DurationInputComponent } from '@/libs/ui/components/DurationInput/DurationInput.component'
 import { TimerTextDisplayComponent } from '@/libs/ui/components/TimerTextDisplay/TimerTextDisplay.component'
+import { VolumeSlider } from '@/libs/ui/components/VolumeSlider/VolumeSlider.component'
 import { PartitionStore } from '@/libs/models/partition/partition.store'
 import { AudioService } from '@/libs/services/audio.service'
 import _ from 'lodash'
@@ -18,23 +19,23 @@ const { floor } = Math
 		TimerTextDisplayComponent,
 		TimerButtonControlsComponent,
 		MatProgressSpinnerModule,
+		VolumeSlider,
 	],
 	templateUrl: './PartitionPage.html',
 	styleUrl: './PartitionPage.scss',
 	host: {
 		class: 'page-container',
-		'(window:keydown)': 'handleWindowKeyDown($event)'
+		'(window:keydown)': 'handleWindowKeyDown($event)',
 	},
-	providers: [
-		PartitionStore,
-	]
+	providers: [PartitionStore],
 })
-export class PartitionPage implements OnInit
-{
-	readonly PROGRESS_SPINNER_DIAMETER = 352;
+export class PartitionPage implements OnInit {
+	readonly PROGRESS_SPINNER_DIAMETER = 352
 	readonly store = inject(PartitionStore)
 	readonly audio = inject(AudioService)
-	activeDurationSeconds = computed(() => floor(this.store.activeDuration() / 1e3))
+	activeDurationSeconds = computed(() =>
+		floor(this.store.activeDuration() / 1e3),
+	)
 	restDurationSeconds = computed(() => floor(this.store.restDuration() / 1e3))
 	onEnterCallback: Function
 	buttonsDisabledState = computed(() => !this.store.totalDuration())
@@ -42,18 +43,14 @@ export class PartitionPage implements OnInit
 	previousRound: number | null
 	previousPortion: string | null = null
 
-	constructor(elementRef: ElementRef)
-	{
+	constructor(elementRef: ElementRef) {
 		this.elementRef = elementRef
 		const { store } = this
-		effect(() =>
-		{
+		effect(() => {
 			const portion = store.currentPortion()
 			const isPaused = store.isPaused()
-			if (portion !== this.previousPortion)
-			{
-				if (!isPaused && portion !== null)
-				{
+			if (portion !== this.previousPortion) {
+				if (!isPaused && portion !== null) {
 					this.audio.play('beep', 'beep.mp3')
 				}
 				this.previousPortion = portion
@@ -61,42 +58,36 @@ export class PartitionPage implements OnInit
 		})
 	}
 
-	ngOnInit(): void
-	{
+	ngOnInit(): void {
 		const { store } = this
-		if (typeof window !== 'undefined') _.merge(window, {
-			partitionStore: store
-		})
+		if (typeof window !== 'undefined')
+			_.merge(window, {
+				partitionStore: store,
+			})
 		this.onEnterCallback = () => this.onStart()
 	}
 
-	onActiveDurationSecondsChange(duration: number)
-	{
+	onActiveDurationSecondsChange(duration: number) {
 		this.store.setActiveDuration(duration * 1e3)
 	}
-	onRestDurationSecondsChange(duration: number)
-	{
+	onRestDurationSecondsChange(duration: number) {
 		this.store.setRestDuration(duration * 1e3)
 	}
 
-	onStart()
-	{
+	onStart() {
 		this.store.safePlay()
 	}
 
-	onStop()
-	{
+	onStop() {
 		this.store.stop()
 	}
 
-	handleWindowKeyDown(event: KeyboardEvent)
-	{
+	handleWindowKeyDown(event: KeyboardEvent) {
 		const { code } = event
 		if (code !== 'Space') return
 		const target = event.target as HTMLElement
 		const { nodeName } = target
-		if (nodeName === 'BODY')
-		{
+		if (nodeName === 'BODY') {
 			this.onStart()
 			event.preventDefault()
 		}

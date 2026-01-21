@@ -63,7 +63,13 @@ export class AudioService
 			throw new Error(`Sound "${key}" not loaded and no src provided`)
 		}
 
-		if (_.isNumber(options?.volume)) sound.volume(options.volume)
+		if (_.isNumber(options?.volume))
+		{
+			sound.volume(options.volume)
+		} else
+		{
+			sound.volume(this.volume)
+		}
 
 		const id = sound.play()
 
