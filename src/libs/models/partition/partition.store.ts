@@ -26,7 +26,8 @@ export const PartitionStore = signalStore(
 		restDuration,
 		totalDuration,
 	}) => ({
-		currentPortion: computed(() => {
+		currentPortion: computed(() =>
+		{
 			const active = activeDuration()
 			const rest = restDuration()
 			if (!_.every([active, rest], _.isNumber)) return null
@@ -39,9 +40,14 @@ export const PartitionStore = signalStore(
 			if (!duration) return 0
 			return Math.min(
 				100,
-				_.round(100 * (currentTime() / duration), 3)
+				_.round(100 * ((currentTime() % duration) / duration), 3)
 			)
 		}),
+		elapsedRounds: computed(() =>
+		{
+			const t = totalDuration()
+			return t ? Math.floor(currentTime() / t) : null
+		})
 	})),
 	withMethods(store => ({
 		setActiveDuration(activeDuration: number | null)
@@ -51,6 +57,10 @@ export const PartitionStore = signalStore(
 		setRestDuration(restDuration: number | null)
 		{
 			patchState(store, { restDuration })
+		},
+		safePlay(): void
+		{
+			if (store.totalDuration()) this.play()
 		},
 	}))
 )

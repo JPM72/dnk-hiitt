@@ -29,10 +29,10 @@
 			[value]="store.progress()"
 		/>
 	</div>
-	<app-timer-text-display
-		[milliseconds]="store.currentTime()"
-		[showMilliseconds]="false"
-	/>
+	<div class="info-container">
+		<app-timer-text-display [milliseconds]="store.currentTime()" />
+		<div class="elapsed-rounds">{{store.elapsedRounds()}}</div>
+	</div>
 </div>
 <app-timer-button-controls
 	[isPaused]="store.isPaused()"

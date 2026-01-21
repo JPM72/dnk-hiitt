@@ -1,14 +1,25 @@
 @use '@angular/material' as mat;
 
 :host {
-    display: flex;
-    flex-direction: column;
-    row-gap: 1rem;
+	display: flex;
+	flex-direction: column;
+	row-gap: 1rem;
 
 	.status-container {
 		display: flex;
 		justify-content: start;
 		column-gap: 2rem;
+	}
+
+	.info-container {
+		display: flex;
+		flex-direction: column;
+		row-gap: 1rem;
+
+		.elapsed-rounds {
+			font-size: 4rem;
+			font-variant-numeric: tabular-nums;
+		}
 	}
 
 	.progress-spinner-container {
@@ -29,8 +40,7 @@
 			);
 		}
 
-		&[data-current-portion="rest"]
-		{
+		&[data-current-portion='rest'] {
 			@include mat.progress-spinner-overrides(
 				(
 					active-indicator-color: var(--mat-sys-tertiary)
